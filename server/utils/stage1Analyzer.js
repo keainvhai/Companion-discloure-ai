@@ -7,7 +7,7 @@ const HF_TOKEN = process.env.HF_TOKEN;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
- * Step 1: 调用 HuggingFace 模型识别 emotion_label
+ * Step 1: use HuggingFace model to recgnoize emotion_label
  */
 async function analyzeEmotion(text) {
   const url =
@@ -27,7 +27,7 @@ async function analyzeEmotion(text) {
 }
 
 /**
- * Step 2: 根据 emotion 映射唤醒度 arousal_level
+ * Step 2: self identify arousal_level from emotion
  */
 function estimateArousal(emotion) {
   const high = ["anger", "fear"];
@@ -38,7 +38,7 @@ function estimateArousal(emotion) {
 }
 
 /**
- * Step 3: 用 GPT 推理 disclosure_level / distress_score / help_intent
+ * Step 3: use GPT reason disclosure_level / distress_score / help_intent
  */
 async function analyzeDisclosure(text) {
   const res = await openai.chat.completions.create({
@@ -66,7 +66,7 @@ async function analyzeDisclosure(text) {
 }
 
 /**
- * Step 4: 汇总结果 (Stage 1)
+ * Step 4: gather results (Stage 1)
  */
 async function analyzeStage1(text) {
   try {
