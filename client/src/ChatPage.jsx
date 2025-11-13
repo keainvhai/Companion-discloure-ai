@@ -36,12 +36,12 @@ const ChatPage = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3001/chat", {
-        message: input,
+      const res = await axios.post("http://localhost:3001/companion/respond", {
+        text: input,
       });
 
       // 从后端取出回复
-      const reply = res.data.reply || "Sorry, I couldn’t process that.";
+      const reply = res.data.reply || "Sorry, I couldn't process that.";
       const mood = res.data.mood || "neutral";
 
       setMessages([
