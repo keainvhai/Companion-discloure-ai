@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // 导入聊天路由
-app.use("/chat", require("./routes/chat"));
+app.use("/neutral", require("./routes/neutral"));
 // companion 路由
 app.use("/companion", require("./routes/companion"));
 
