@@ -3,7 +3,17 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import "./ChatPage.css";
 
+import { useUsernameStore } from "./store/useUsernameStore";
+
 const ChatPage = () => {
+  const username = useUsernameStore((s) => s.username);
+  const isLocked = useUsernameStore((s) => s.isLocked);
+  const setUsername = useUsernameStore((s) => s.setUsername);
+  const lockUsername = useUsernameStore((s) => s.lockUsername);
+
+  const [showEdit, setShowEdit] = useState(false);
+  const [editTemp, setEditTemp] = useState(username);
+
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -13,6 +23,7 @@ const ChatPage = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
 
   const getAvatar = (mood) => {
     switch (mood) {
@@ -30,6 +41,9 @@ const ChatPage = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
+    // 🔐 第一条消息后锁定 username
+    if (!isLocked) lockUsername();
+
     const newMessages = [...messages, { role: "user", content: input }];
     setMessages(newMessages);
     setInput("");
@@ -38,7 +52,14 @@ const ChatPage = () => {
     try {
       const res = await axios.post("http://localhost:3001/companion/respond", {
         text: input,
+        conversationId: conversationId,
+        username: username,
       });
+
+      // ⭐ 保存后端返回的 conversationId（第一次聊天的新值）
+      if (!conversationId && res.data.conversationId) {
+        setConversationId(res.data.conversationId);
+      }
 
       // 从后端取出回复
       const reply = res.data.reply || "Sorry, I couldn't process that.";
@@ -66,6 +87,40 @@ const ChatPage = () => {
   return (
     <div className="chat-container">
       <h2 className="chat-title">AI Companion Chat</h2>
+
+      {/* ⭐ 顶部提示条（发送前可修改） */}
+      {!isLocked && (
+        <div className="notice-bar">
+          ✨ Before start, you can modify conversation settings
+          <button className="edit-btn" onClick={() => setShowEdit(true)}>
+            Edit
+          </button>
+        </div>
+      )}
+
+      {/* ⭐ Edit 弹出的浮层 */}
+      {showEdit && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Edit Username</h3>
+            <input
+              value={editTemp}
+              onChange={(e) => setEditTemp(e.target.value)}
+            />
+            <div className="modal-actions">
+              <button
+                onClick={() => {
+                  setUsername(editTemp.trim());
+                  setShowEdit(false);
+                }}
+              >
+                Save
+              </button>
+              <button onClick={() => setShowEdit(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="messages">
         {messages.map((m, i) => (

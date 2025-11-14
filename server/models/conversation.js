@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: "companion",
     },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   });
 
   Conversation.associate = (models) => {

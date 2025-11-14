@@ -4,6 +4,10 @@ const router = express.Router();
 const OpenAI = require("openai");
 const { analyzeStage1 } = require("../utils/stage1Analyzer.js");
 
+const db = require("../models");
+const Conversation = db.Conversation;
+const Message = db.Message;
+
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 router.post("/analyze", async (req, res) => {
@@ -23,9 +27,20 @@ router.post("/analyze", async (req, res) => {
  */
 router.post("/respond", async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, conversationId, username } = req.body;
 
-    // 1️⃣ 先执行情绪识别
+    // 1 ------- 如果没有 conversationId，创建一个新的 ----------
+    let convoId = conversationId;
+    if (!convoId) {
+      const newConvo = await Conversation.create({
+        userId: null,
+        username: username || null,
+        aiType: "companion",
+      });
+      convoId = newConvo.id;
+    }
+
+    // 2 先执行情绪识别
     const stage1 = await analyzeStage1(text);
 
     const {
@@ -36,7 +51,15 @@ router.post("/respond", async (req, res) => {
       help_intent,
     } = stage1;
 
-    // 2️⃣ 构造 GPT 提示词（包含 Conditioning / Congruence / Reciprocity）
+    // 3 ------- 保存用户消息到 Messages 表 ----------
+    const userMsg = await Message.create({
+      conversationId: convoId,
+      role: "user",
+      text,
+      analysis: stage1, // JSON 保存分析结果
+    });
+
+    // 4 构造 GPT 提示词（包含 Conditioning / Congruence / Reciprocity）
     const systemPrompt = `
 You are a compassionate AI companion trained for victims of online harassment.
 Your goal: respond with empathy, calmness, and validation — never judgment or advice-giving.
@@ -66,7 +89,7 @@ Always follow these layered rules:
 Always alleviate distress, promote well-being, and uphold dignity.
 `;
 
-    // 3️⃣ 生成 GPT 回复
+    //  生成 GPT 回复
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.8,
@@ -82,8 +105,17 @@ User said: "${text}"`,
 
     const reply = completion.choices[0].message.content;
 
-    // 4️⃣ 返回结果
+    // 5 ------- 保存 AI 回复 ----------
+    const aiMsg = await Message.create({
+      conversationId: convoId,
+      role: "assistant",
+      text: reply,
+      analysis: null, // AI 回复不需要 Stage1 分析
+    });
+
+    // 6 返回结果
     res.json({
+      conversationId: convoId,
       analysis: stage1,
       reply,
     });
