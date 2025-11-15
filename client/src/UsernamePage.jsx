@@ -10,7 +10,7 @@ const UsernamePage = () => {
   const startChat = () => {
     if (!tempName.trim()) return alert("Please enter a username.");
     setUsername(tempName.trim());
-    navigate("/chat");
+    navigate(-1); // 返回上一个页面
   };
 
   return (

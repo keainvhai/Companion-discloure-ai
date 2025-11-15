@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ChatPage from "./ChatPage";
+import CompassionChatPage from "./CompanionChatPage";
 import UsernamePage from "./UsernamePage";
+import NeutralChatPage from "./NeutralChatPage";
+import NonCompanionChatPage from "./NonCompanionChatPage";
 
 function App() {
   return (
@@ -8,7 +10,9 @@ function App() {
       <Routes>
         {/* 默认主页：Chat 页面 */}
         <Route path="/" element={<UsernamePage />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chatA" element={<CompassionChatPage />} />
+        <Route path="/chatB" element={<NeutralChatPage />} />
+        <Route path="/chatC" element={<NonCompanionChatPage />} />
       </Routes>
     </BrowserRouter>
   );
