@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import "./ChatPage.css";
+import api from "./api";
 
 import { useUsernameStore } from "./store/useUsernameStore";
 import { useNavigate } from "react-router-dom";
@@ -59,7 +60,7 @@ const NeutralChatPage = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3001/neutral/respond", {
+      const res = await api.post("/neutral/respond", {
         text: input,
         conversationId: conversationId,
         username: username,

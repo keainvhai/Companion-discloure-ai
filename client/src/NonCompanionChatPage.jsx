@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import "./ChatPage.css";
+import api from "./api";
 
 import { useUsernameStore } from "./store/useUsernameStore";
 import { useNavigate } from "react-router-dom";
@@ -59,14 +60,11 @@ const NonCompanionChatPage = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:3001/noncompanion/respond",
-        {
-          text: input,
-          conversationId: conversationId,
-          username: username,
-        }
-      );
+      const res = await api.post("/noncompanion/respond", {
+        text: input,
+        conversationId: conversationId,
+        username: username,
+      });
 
       // ⭐ 保存后端返回的 conversationId（第一次聊天的新值）
       if (!conversationId && res.data.conversationId) {
