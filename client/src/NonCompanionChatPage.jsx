@@ -1,39 +1,39 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import ReactMarkdown from "react-markdown";
-import "./ChatPage.css";
 import api from "./api";
+import "./ChatPage.css";
 
 import { useUsernameStore } from "./store/useUsernameStore";
 import { useNavigate } from "react-router-dom";
 
+const MODE = "chatC"; // ⭐ 当前页面对应模式
+
 const NonCompanionChatPage = () => {
-  const username = useUsernameStore((s) => s.username);
-
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!username) {
-      navigate("/");
-    }
-  }, [username, navigate]);
 
+  // 基础用户信息
+  const username = useUsernameStore((s) => s.username);
   const isLocked = useUsernameStore((s) => s.isLocked);
   const setUsername = useUsernameStore((s) => s.setUsername);
   const lockUsername = useUsernameStore((s) => s.lockUsername);
 
+  // ⭐ 独立的聊天记录
+  const messages = useUsernameStore((s) => s.messagesByMode[MODE] || []);
+  const addMessage = useUsernameStore((s) => s.addMessage);
+
+  // ⭐ 独立的 conversationId
+  const conversationId = useUsernameStore((s) => s.conversationIdByMode[MODE]);
+  const setConversationId = useUsernameStore((s) => s.setConversationId);
+
   const [showEdit, setShowEdit] = useState(false);
   const [editTemp, setEditTemp] = useState(username);
-
-  const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      content: "Hi, I'm your AI Companion. How are you today?",
-      mood: "neutral",
-    },
-  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [conversationId, setConversationId] = useState(null);
+
+  // 如果没用户名 → 回首页
+  useEffect(() => {
+    if (!username) navigate("/");
+  }, [username, navigate]);
 
   const getAvatar = (mood) => {
     switch (mood) {
@@ -51,44 +51,40 @@ const NonCompanionChatPage = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    // 🔐 第一条消息后锁定 username
     if (!isLocked) lockUsername();
 
-    const newMessages = [...messages, { role: "user", content: input }];
-    setMessages(newMessages);
+    const userText = input;
+    addMessage(MODE, { role: "user", content: userText });
+
     setInput("");
     setLoading(true);
 
     try {
       const res = await api.post("/noncompanion/respond", {
-        text: input,
-        conversationId: conversationId,
-        username: username,
+        text: userText,
+        conversationId,
+        username,
       });
 
-      // ⭐ 保存后端返回的 conversationId（第一次聊天的新值）
+      // 第一次生成 conversationId → 独立保存
       if (!conversationId && res.data.conversationId) {
-        setConversationId(res.data.conversationId);
+        setConversationId(MODE, res.data.conversationId);
       }
 
-      // 从后端取出回复
       const reply = res.data.reply || "Sorry, I couldn't process that.";
       const mood = res.data.mood || "neutral";
 
-      setMessages([
-        ...newMessages,
-        { role: "assistant", content: reply, mood },
-      ]);
+      addMessage(MODE, {
+        role: "assistant",
+        content: reply,
+        mood,
+      });
     } catch (err) {
-      console.error("Chat API error:", err);
-      setMessages([
-        ...newMessages,
-        {
-          role: "assistant",
-          content: "❌ Something went wrong with the AI.",
-          mood: "neutral",
-        },
-      ]);
+      addMessage(MODE, {
+        role: "assistant",
+        content: "❌ Something went wrong with the AI.",
+        mood: "neutral",
+      });
     } finally {
       setLoading(false);
     }
@@ -96,19 +92,17 @@ const NonCompanionChatPage = () => {
 
   return (
     <div className="chat-container">
-      <h2 className="chat-title">AI Companion Chat</h2>
+      <h2 className="chat-title">Non-Companion Chat</h2>
 
-      {/* ⭐ 顶部提示条（发送前可修改） */}
       {!isLocked && (
         <div className="notice-bar">
-          ✨ Before start, you can modify conversation settings
+          ✨ Before starting, you can modify username
           <button className="edit-btn" onClick={() => setShowEdit(true)}>
             Edit
           </button>
         </div>
       )}
 
-      {/* ⭐ Edit 弹出的浮层 */}
       {showEdit && (
         <div className="modal">
           <div className="modal-content">
