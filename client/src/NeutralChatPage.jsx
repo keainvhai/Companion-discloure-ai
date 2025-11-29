@@ -87,7 +87,7 @@ const NeutralChatPage = () => {
 
   return (
     <div className="chat-container">
-      <h2 className="chat-title">Neutral Chat</h2>
+      <h2 className="chat-title">Chat</h2>
 
       {!isLocked && (
         <div className="notice-bar">

@@ -83,7 +83,7 @@ const CompassionChatPage = () => {
 
   return (
     <div className="chat-container">
-      <h2 className="chat-title">AI Companion Chat</h2>
+      <h2 className="chat-title">Chat</h2>
 
       {!isLocked && (
         <div className="notice-bar">

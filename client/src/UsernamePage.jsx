@@ -19,12 +19,12 @@ const UsernamePage = () => {
         <h2>👋 Welcome to use Compassionate AI</h2>
 
         <div style={styles.row}>
-          <label style={{ marginRight: 10 }}>Username</label>
+          <label style={{ marginRight: 10 }}>Participant ID</label>
           <input
             style={styles.input}
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
-            placeholder="Enter your username"
+            placeholder="Enter your Participant ID"
           />
         </div>
 
