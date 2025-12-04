@@ -16,7 +16,7 @@ const UsernamePage = () => {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>👋 Welcome to use Compassionate AI</h2>
+        <h2>👋 Welcome to use conversational AI</h2>
 
         <div style={styles.row}>
           <label style={{ marginRight: 10 }}>Participant ID</label>

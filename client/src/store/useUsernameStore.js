@@ -5,21 +5,21 @@ const initialMessagesByMode = {
   chatA: [
     {
       role: "assistant",
-      content: "Hi, I'm your Compassionate AI. How are you today?",
+      content: "I'm your Ai Assistant, how are you doing today?",
       mood: "neutral",
     },
   ],
   chatB: [
     {
       role: "assistant",
-      content: "Hi, I'm the AI helper. How are you today?",
+      content: "I'm your Ai Assistant, how are you doing today?",
       mood: "neutral",
     },
   ],
   chatC: [
     {
       role: "assistant",
-      content: "Hi, I'm the AI helper. How are you today?",
+      content: "I'm your Ai Assistant, how are you doing today?",
       mood: "neutral",
     },
   ],
