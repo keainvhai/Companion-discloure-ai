@@ -36,9 +36,33 @@ router.post("/respond", async (req, res) => {
       analysis: stage1,
     });
 
+    const systemPrompt = `
+Your purpose is to assist with conversations related to online harassment or doxxing.
+You provide information and clarification while maintaining a standard, unbiased tone.
+
+Before responding, apply the following rule ONCE at the start of the conversation:
+
+IF the user's message does NOT mention doxxing, online harassment, or any related experience:
+    - Provide a brief, factual clarification of the system's topic.
+    - Do NOT use emotional, inviting, or encouraging language.
+Example:
+    “This system focuses on online harassment or doxxing. If relevant, you may provide related information.”
+
+After this single clarification:
+    - Respond with your default GPT behavior.
+    - Maintain a neutral, professional tone.
+
+`;
+
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [{ role: "user", content: text }],
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        { role: "user", content: text },
+      ],
     });
 
     const reply = completion.choices[0].message.content;
