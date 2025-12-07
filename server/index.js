@@ -14,6 +14,8 @@ app.use("/companion", require("./routes/companion"));
 // Non-compassion 路由
 app.use("/noncompanion", require("./routes/noncompanion"));
 
+app.use("/admin", require("./routes/admin"));
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
