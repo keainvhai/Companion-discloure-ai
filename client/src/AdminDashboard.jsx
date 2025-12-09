@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import api from "./api"; // 引用你封装好的 axios 实例
 
 const AdminDashboard = () => {
   const [conversations, setConversations] = useState([]);
@@ -18,8 +19,8 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!adminToken) return; // 🔥 没 token 不要访问 API
 
-    axios
-      .get("http://localhost:3001/admin/conversations", {
+    api
+      .get("/admin/conversations", {
         headers: { "x-admin-token": adminToken },
       })
       .then((res) => {
@@ -34,12 +35,10 @@ const AdminDashboard = () => {
     setSelectedConversation(convo);
 
     try {
-      const res = await axios.get(
-        `http://localhost:3001/admin/messages/${convo.id}`,
-        {
-          headers: { "x-admin-token": adminToken },
-        }
-      );
+      const res = await api.get(`/admin/messages/${convo.id}`, {
+        headers: { "x-admin-token": adminToken },
+      });
+
       setMessages(res.data);
     } catch (err) {
       console.error("Failed to load messages", err);
@@ -94,7 +93,9 @@ const AdminDashboard = () => {
         <button
           onClick={() =>
             window.open(
-              `http://localhost:3001/admin/export-all?token=${adminToken}`
+              `${
+                import.meta.env.VITE_API_URL
+              }/admin/export-all?token=${adminToken}`
             )
           }
           style={{ marginBottom: 10 }}
@@ -139,7 +140,9 @@ const AdminDashboard = () => {
             <button
               onClick={() =>
                 window.open(
-                  `http://localhost:3001/admin/export/${selectedConversation.id}?token=${adminToken}`
+                  `${import.meta.env.VITE_API_URL}/admin/export/${
+                    selectedConversation.id
+                  }?token=${adminToken}`
                 )
               }
               style={{ marginBottom: 10 }}
