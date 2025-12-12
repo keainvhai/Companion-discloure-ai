@@ -190,8 +190,9 @@ router.get("/export-all", adminCheck, async (req, res) => {
         convoInfo.aiType || ""
       },${convoInfo.username || ""},${
         convoInfo.userId || ""
-      },"${safeText}",${formatDateEST(m.createdAt)}
-,${formatDateEST(m.updatedAt)},"${safeAnalysis}"\n`;
+      },"${safeText}",${formatDateEST(m.createdAt)},${formatDateEST(
+        m.updatedAt
+      )},"${safeAnalysis}"\n`;
     });
 
     // 设置下载 headers

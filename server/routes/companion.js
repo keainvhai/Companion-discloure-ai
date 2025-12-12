@@ -143,7 +143,7 @@ You MUST apply all rules simultaneously. You MUST NOT override or ignore any rul
 
     //  生成 GPT 回复
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5.2",
       temperature: 0.8,
       messages: [
         { role: "system", content: systemPrompt },
