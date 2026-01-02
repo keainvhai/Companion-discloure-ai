@@ -19,12 +19,12 @@ const UsernamePage = () => {
         <h2>👋 Welcome to use conversational AI</h2>
 
         <div style={styles.row}>
-          <label style={{ marginRight: 10 }}>Participant ID</label>
+          <label style={{ marginRight: 10 }}>Prolific ID</label>
           <input
             style={styles.input}
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
-            placeholder="Enter your Participant ID"
+            placeholder="Enter your Prolific ID"
           />
         </div>
 
